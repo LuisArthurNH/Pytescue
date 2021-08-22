@@ -3,12 +3,55 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 
 ###########################################################
-################# signal definition #######################
+################# Define Functions ########################
 ###########################################################
+
+
+
+def calculate(mag, theta):
+
+    mag_a = mag[0]
+    mag_b = mag[1]
+    mag_c = mag[2]
+
+    Va = mag_a*np.exp(+1j*( 0      + theta_a))
+    Vb = mag_b*np.exp(-1j*(2*pi/3  + theta_b))
+    Vc = mag_c*np.exp(+1j*(2*pi/3  + theta_c))
+
+    Vabc = [Va, Vb, Vc]
+
+    # Define Fortescue Transform
+    Vap = K*(Va +   Vb*a    +  Vc*a**2)
+    Vam = K*(Va +   Vb*a**2 +  Vc*a)
+    Va0 = K*(Va +   Vb      +  Vc)
+
+    Vpm0_a = [Vap, Vam, Va0]
+    Vpm0_b = [Vap*a**2, Vam*a, Va0]
+    Vpm0_c = [Vap*a, Vam*a**2, Va0]
+
+    Vfortescue = [Vpm0_a,Vpm0_b,Vpm0_c]
+
+    return Vabc, Vfortescue
+
+
+
+def plots():
+    pass
+
+
+############################################################
+################
+############################################################
+
 pi = np.pi
 
-lim_x = (-1.1, 1.1)
-lim_y = (-0.9, 0.9)
+# colors
+col_abc = ['b','g','r']                # abc phasors
+col_pm0 = ['k','aqua','blueviolet']    # positive, negative and zero phasors
+
+
+lim_x = (-1.25, 1.25)
+lim_y = (-1, 1)
 
 # define operator a: complex 1<120º
 a = 1*np.exp(1j*2*pi/3)
@@ -17,30 +60,40 @@ a = 1*np.exp(1j*2*pi/3)
 
 theta_a = 0*(20)*pi/180
 theta_b = 0*(60)*pi/180
-theta_c = 0*(+120)*pi/180
+theta_c = 0*(120)*pi/180
 
-Va = 1*np.exp(+1j*( 0      + theta_a))
-Vb = 1*np.exp(-1j*(2*pi/3  + theta_b))
-Vc = 1*np.exp(+1j*(2*pi/3  + theta_c))
+theta = [theta_a, theta_b, theta_c]
 
-Vabc = [Va, Vb, Vc]
-col_abc = ['b','g','r']
+mag_a = 1
+mag_b = 1
+mag_c = 1
 
-# Define Fortescue Transform
+mag = [mag_a, mag_b, mag_c]
 
-K = 1/3  # Fortescue constant (use sqrt(3)/3 for power-invariant transform)
+# Fortescue constant (use sqrt(3)/3 for power-invariant transform)
+K = 1/3  
 
-Vap = K*(Va +   Vb*a    +  Vc*a**2)
-Vam = K*(Va +   Vb*a**2 +  Vc*a)
-Va0 = K*(Va +   Vb      +  Vc)
+# Call function
+Vabc, Vfortescue = calculate(mag, theta)
 
-Vpm0_a = [Vap, Vam, Va0]
-Vpm0_b = [Vap*a**2, Vam*a, Va0]
-Vpm0_c = [Vap*a, Vam*a**2, Va0]
+# Va = 1*np.exp(+1j*( 0      + theta_a))
+# Vb = 1*np.exp(-1j*(2*pi/3  + theta_b))
+# Vc = 1*np.exp(+1j*(2*pi/3  + theta_c))
 
-Vfortescue = [Vpm0_a,Vpm0_b,Vpm0_c]
+# Vabc = [Va, Vb, Vc]
 
-col_pm0 = ['k','aqua','blueviolet']
+# # Define Fortescue Transform
+# Vap = K*(Va +   Vb*a    +  Vc*a**2)
+# Vam = K*(Va +   Vb*a**2 +  Vc*a)
+# Va0 = K*(Va +   Vb      +  Vc)
+
+# Vpm0_a = [Vap, Vam, Va0]
+# Vpm0_b = [Vap*a**2, Vam*a, Va0]
+# Vpm0_c = [Vap*a, Vam*a**2, Va0]
+
+# Vfortescue = [Vpm0_a,Vpm0_b,Vpm0_c]
+
+
 
 # Plot stuff
 fig, ax = plt.subplots()
@@ -109,83 +162,39 @@ axtheta_c = plt.axes([0.26, 0.1, width, 0.78], facecolor=axcolor)
 
 ###### create sliders
 
-slid_mag_a = Slider(
-    ax=axmag_a,
-    label="Ma",
-    valmin=mag_min,
-    valmax=mag_max,
-    valinit=mag_ini,
-    valstep=0.1,
-    orientation="vertical",
-    color='b'
-)
+# phase a
+slid_mag_a = Slider(ax=axmag_a,label="Ma",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=0.1,
+orientation="vertical",color='b')
+slid_theta_a = Slider(ax=axtheta_a,label="Aa",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+orientation="vertical",color='b')
 
-slid_theta_a = Slider(
-    ax=axtheta_a,
-    label="Aa",
-    valmin=theta_min,
-    valmax=theta_max,
-    valinit=theta_ini,
-    valstep=0.1,
-    orientation="vertical",
-    color='b'
-)
+# phase b
+slid_mag_b = Slider(ax=axmag_b,label="Mb",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=0.1,
+orientation="vertical",color='g')
+slid_theta_b = Slider(ax=axtheta_b,label="Ab",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+orientation="vertical",color='g')
 
-
-slid_mag_b = Slider(
-    ax=axmag_b,
-    label="Mb",
-    valmin=mag_min,
-    valmax=mag_max,
-    valinit=mag_ini,
-    valstep=0.1,
-    orientation="vertical",
-    color='g'
-)
-
-slid_theta_b = Slider(
-    ax=axtheta_b,
-    label="Ab",
-    valmin=theta_min,
-    valmax=theta_max,
-    valinit=theta_ini,
-    valstep=0.1,
-    orientation="vertical",
-    color='g'
-)
-
-
-
-slid_mag_c = Slider(
-    ax=axmag_c,
-    label="Mc",
-    valmin=mag_min,
-    valmax=mag_max,
-    valinit=mag_ini,
-    valstep=0.1,
-    orientation="vertical",
-    color='r'
-)
-
-slid_theta_c = Slider(
-    ax=axtheta_c,
-    label="Ac",
-    valmin=theta_min,
-    valmax=theta_max,
-    valinit=theta_ini,
-    valstep=0.1,
-    orientation="vertical",
-    color='r'
-)
+# phase c
+slid_mag_c = Slider(ax=axmag_c,label="Mc",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=0.1,
+orientation="vertical",color='r')
+slid_theta_c = Slider(ax=axtheta_c,label="Ac",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+orientation="vertical",color='r')
 
 
 
 ############################################################################
-############################### Def Function ###############################
+############################## Def Functions ###############################
 ############################################################################ 
+
+
+##############################
+####### Calculate PM0
+##############################
+
 
 def update(val):
 
+    # update magnitudes and phase for ABC quantities
     theta_a = slid_theta_a.val*pi/180
     mag_a = slid_mag_a.val
 
@@ -195,6 +204,7 @@ def update(val):
     theta_c = slid_theta_c.val*pi/180
     mag_c = slid_mag_c.val
     
+    # call function
     Va = mag_a*np.exp(+1j*( 0      + theta_a))
     Vb = mag_b*np.exp(-1j*(2*pi/3  + theta_b))
     Vc = mag_c*np.exp(+1j*(2*pi/3  + theta_c))
@@ -216,17 +226,6 @@ def update(val):
     ax.grid(ls=':')
     ax.set(xlim=lim_x, ylim=lim_y)
 
-    aux = 0 
-    for abc in Vabc:
-        # plot abc voltage phasors
-        color_a = col_abc[aux]
-        if abs(abc) > 0.01:
-            ax.arrow(0, 0, np.real(abc), np.imag(abc), color=color_a, length_includes_head=True, width=0.005, head_width=None, head_length=None,overhang=0.6) 
-        
-        aux += 1
-
-
-
     for pm0 in Vfortescue:
         aux = 0
         off_x = 0
@@ -235,12 +234,22 @@ def update(val):
         for phase_pm0 in pm0:
             color_p = col_pm0[aux]
             pm0 = phase_pm0
-            if abs(abc) > 0.01:
+            if abs(pm0) > 0.01:
                 ax.arrow(off_x, off_y, np.real(pm0), np.imag(pm0), color=color_p, length_includes_head=True, width=0.005, head_width=None, head_length=None,overhang=0.6) 
                 off_x += np.real(pm0)
                 off_y += np.imag(pm0)
             aux += 1
 
+
+
+    aux = 0 
+    for abc in Vabc:
+        # plot abc voltage phasors
+        color_a = col_abc[aux]
+        if abs(abc) > 0.01:
+            ax.arrow(0, 0, np.real(abc), np.imag(abc), color=color_a, length_includes_head=True, width=0.005, head_width=None, head_length=None,overhang=0.6) 
+        
+        aux += 1
 
         
     fig.canvas.draw_idle()
