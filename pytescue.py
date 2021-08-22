@@ -9,8 +9,8 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 pi = np.pi
 
 # colors
-col_abc = ['b','g','r']                # abc phasors
-col_pm0 = ['tab:brown','tab:olive','tab:cyan']    # positive, negative and zero phasors
+col_abc = ['b','g','r']                           # abc phasors
+col_pn0 = ['tab:brown','tab:olive','tab:cyan']    # positive, negative and zero phasors
 
 
 lim_x = (-1.25, 1.25)
@@ -20,7 +20,7 @@ a = 1*np.exp(1j*2*pi/3)
 
 
 #################################
-####### Calculate Vabc and Vpm0
+####### Calculate Vabc and Vpn0
 #################################
 
 def calculate(mag, theta):
@@ -46,11 +46,11 @@ def calculate(mag, theta):
     Vam = K*(Va +   Vb*a**2 +  Vc*a)
     Va0 = K*(Va +   Vb      +  Vc)
 
-    Vpm0_a = [Vap, Vam, Va0]
-    Vpm0_b = [Vap*a**2, Vam*a, Va0]
-    Vpm0_c = [Vap*a, Vam*a**2, Va0]
+    Vpn0_a = [Vap, Vam, Va0]
+    Vpn0_b = [Vap*a**2, Vam*a, Va0]
+    Vpn0_c = [Vap*a, Vam*a**2, Va0]
 
-    Vfortescue = [Vpm0_a,Vpm0_b,Vpm0_c]      # agregate data
+    Vfortescue = [Vpn0_a,Vpn0_b,Vpn0_c]      # agregate data
 
     return Vabc, Vfortescue
 
@@ -59,24 +59,20 @@ def calculate(mag, theta):
 def plots(Vabc, Vfortescue, both=True):
 
     if both:
-        for pm0 in Vfortescue:
+        for pn0 in Vfortescue:
             aux = 0
             off_x = 0
             off_y = 0
 
-            for phase_pm0 in pm0:
-                color_p = col_pm0[aux]
-                pm0 = phase_pm0
-                if abs(pm0) > 0.01:
-                    ax.arrow(off_x, off_y, np.real(pm0), np.imag(pm0), color=color_p, length_includes_head=True,
+            for phase_pn0 in pn0:
+                color_p = col_pn0[aux]
+                pn0 = phase_pn0
+                if abs(pn0) > 0.01:
+                    ax.arrow(off_x, off_y, np.real(pn0), np.imag(pn0), color=color_p, length_includes_head=True,
                              width=0.005, head_width=None, head_length=None,overhang=0.6) 
-                    off_x += np.real(pm0)
-                    off_y += np.imag(pm0)
+                    off_x += np.real(pn0)
+                    off_y += np.imag(pn0)
                 aux += 1
-
-
-
-
 
     aux = 0 
     for abc in Vabc:
@@ -87,7 +83,25 @@ def plots(Vabc, Vfortescue, both=True):
         
         aux += 1
 
-    # ax.legend()
+    # add text legend for ABC components
+    ax.text(1, 1, "Phase A \n \n \n", size=10,
+            ha="center", va="center", c=col_abc[0], bbox=dict(facecolor='white', ec='grey'))
+
+    ax.text(0.99, 1, "Phase B", size=10,
+            ha="center", va="center", c=col_abc[1])
+
+    ax.text(0.99, 0.89, "Phase C", size=10,
+            ha="center", va="center", c=col_abc[2])
+
+    # add text legend for PN0
+    ax.text(1, -1, " Positive \n \n \n", size=10,
+            ha="center", va="center", c=col_pn0[0], weight='bold', bbox=dict(facecolor='white', ec='grey'))
+
+    ax.text(0.99, -1, " Negative", size=10,
+            ha="center", va="center", c=col_pn0[1], weight='bold')
+
+    ax.text(0.99, -1.1, "Zero", size=10,
+            ha="center", va="center", c=col_pn0[2], weight='bold')
 
 
 
@@ -118,6 +132,7 @@ fig, ax = plt.subplots()
 ax.set(xlim=lim_x, ylim=lim_y)
 ax.set_box_aspect(1)
 ax.grid(ls=':')
+
 
 plots(Vabc, Vfortescue, both=False)
 
@@ -160,23 +175,25 @@ resetax = plt.axes([0.0854, 0.003, 0.08, 0.04])
 
 ###### create sliders
 
+step_mag = 0.01
+
 # phase a
-slid_mag_a = Slider(ax=axmag_a,label="Ma",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=0.1,
-orientation="vertical",color='b')
-slid_theta_a = Slider(ax=axtheta_a,label="Aa",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
-orientation="vertical",color='b')
+slid_mag_a = Slider(ax=axmag_a,label=r"$|f_{A}|$",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=step_mag,
+orientation="vertical",color=col_abc[0])
+slid_theta_a = Slider(ax=axtheta_a,label=r"$\theta_{A}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+orientation="vertical",color=col_abc[0])
 
 # phase b
-slid_mag_b = Slider(ax=axmag_b,label="Mb",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=0.1,
-orientation="vertical",color='g')
-slid_theta_b = Slider(ax=axtheta_b,label="Ab",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
-orientation="vertical",color='g')
+slid_mag_b = Slider(ax=axmag_b,label=r"$|f_{B}|$",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=step_mag,
+orientation="vertical",color=col_abc[1])
+slid_theta_b = Slider(ax=axtheta_b,label=r"$\theta_{B}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+orientation="vertical",color=col_abc[1])
 
 # phase c
-slid_mag_c = Slider(ax=axmag_c,label="Mc",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=0.1,
-orientation="vertical",color='r')
-slid_theta_c = Slider(ax=axtheta_c,label="Ac",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
-orientation="vertical",color='r')
+slid_mag_c = Slider(ax=axmag_c,label=r"$|f_{C}|$",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=step_mag,
+orientation="vertical",color=col_abc[2])
+slid_theta_c = Slider(ax=axtheta_c,label=r"$\theta_{C}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+orientation="vertical",color=col_abc[2])
 
 # reset button
 button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
