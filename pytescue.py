@@ -3,10 +3,25 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 
 ###########################################################
-################# Define Functions ########################
+################# Define Constants ########################
 ###########################################################
 
+pi = np.pi
 
+# colors
+col_abc = ['b','g','r']                # abc phasors
+col_pm0 = ['tab:brown','tab:olive','tab:cyan']    # positive, negative and zero phasors
+
+
+lim_x = (-1.25, 1.25)
+lim_y = (-1.25, 1.25)
+# define operator a: complex 1<120º
+a = 1*np.exp(1j*2*pi/3)
+
+
+#################################
+####### Calculate Vabc and Vpm0
+#################################
 
 def calculate(mag, theta):
 
@@ -53,10 +68,13 @@ def plots(Vabc, Vfortescue, both=True):
                 color_p = col_pm0[aux]
                 pm0 = phase_pm0
                 if abs(pm0) > 0.01:
-                    ax.arrow(off_x, off_y, np.real(pm0), np.imag(pm0), color=color_p, length_includes_head=True, width=0.005, head_width=None, head_length=None,overhang=0.6) 
+                    ax.arrow(off_x, off_y, np.real(pm0), np.imag(pm0), color=color_p, length_includes_head=True,
+                             width=0.005, head_width=None, head_length=None,overhang=0.6) 
                     off_x += np.real(pm0)
                     off_y += np.imag(pm0)
                 aux += 1
+
+
 
 
 
@@ -69,24 +87,13 @@ def plots(Vabc, Vfortescue, both=True):
         
         aux += 1
 
+    # ax.legend()
+
 
 
 ############################################################
-################
+################ Initial values plot #######################
 ############################################################
-
-pi = np.pi
-
-# colors
-col_abc = ['b','g','r']                # abc phasors
-col_pm0 = ['k','aqua','blueviolet']    # positive, negative and zero phasors
-
-
-lim_x = (-1.25, 1.25)
-lim_y = (-1, 1)
-
-# define operator a: complex 1<120º
-a = 1*np.exp(1j*2*pi/3)
 
 # define module and phase for ABC quantities
 
@@ -112,8 +119,13 @@ ax.set(xlim=lim_x, ylim=lim_y)
 ax.set_box_aspect(1)
 ax.grid(ls=':')
 
-
 plots(Vabc, Vfortescue, both=False)
+
+###################################################################
+######################### Define Sliders ##########################
+###################################################################
+
+axcolor = 'lightgrey'
         
 ###### Slider data
 # Magnitude limits
@@ -127,23 +139,24 @@ theta_ini = 0                        # initial frequency plot
 theta_max = 180                      # max frequency on range [Hz]
 theta_min = -180                        # min freq
 
-
-
 axcolor = 'lightgoldenrodyellow'
 
 width = 0.02
 
 # phase a
-axmag_a   = plt.axes([0.07, 0.1, width , 0.78], facecolor=axcolor)
-axtheta_a = plt.axes([0.1, 0.1, width, 0.78], facecolor=axcolor)
+axmag_a   = plt.axes([0.02, 0.1, width , 0.78], facecolor=axcolor)
+axtheta_a = plt.axes([0.05, 0.1, width, 0.78], facecolor=axcolor)
 
 # phase b
-axmag_b   = plt.axes([0.15, 0.1, width , 0.78], facecolor=axcolor)
-axtheta_b = plt.axes([0.18, 0.1, width, 0.78], facecolor=axcolor)
+axmag_b   = plt.axes([0.10, 0.1, width , 0.78], facecolor=axcolor)
+axtheta_b = plt.axes([0.13, 0.1, width, 0.78], facecolor=axcolor)
 
 # phase c
-axmag_c   = plt.axes([0.23, 0.1, width , 0.78], facecolor=axcolor)
-axtheta_c = plt.axes([0.26, 0.1, width, 0.78], facecolor=axcolor)
+axmag_c   = plt.axes([0.18, 0.1, width , 0.78], facecolor=axcolor)
+axtheta_c = plt.axes([0.21, 0.1, width, 0.78], facecolor=axcolor)
+
+# reset button
+resetax = plt.axes([0.0854, 0.003, 0.08, 0.04])
 
 ###### create sliders
 
@@ -165,17 +178,12 @@ orientation="vertical",color='r')
 slid_theta_c = Slider(ax=axtheta_c,label="Ac",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
 orientation="vertical",color='r')
 
-
+# reset button
+button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
 ############################################################################
 ############################## Def Functions ###############################
 ############################################################################ 
-
-
-##############################
-####### Calculate PM0
-##############################
-
 
 def update(val):
 
@@ -215,6 +223,19 @@ slid_theta_b.on_changed(update)
 slid_mag_c.on_changed(update)
 slid_theta_c.on_changed(update)
 
+# define reset button
+
+def reset(event):
+    slid_mag_a.reset()
+    slid_theta_a.reset()
+
+    slid_mag_b.reset()
+    slid_theta_b.reset()
+
+    slid_mag_c.reset()
+    slid_theta_c.reset()
+    
+button.on_clicked(reset)
 
 
 
