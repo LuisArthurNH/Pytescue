@@ -99,15 +99,17 @@ def plots(Vabc, Vfortescue, both=True):
         V_ph.append(0) if round(abs(abc),2) == 0  else V_ph.append(np.angle(abc))
         aux += 1
 
+    # where to place the legend
+    off_x_leg = 1
 
     # add text legend for ABC components
-    ax.text(1, 1, f"   Phase A: {V_m[0]:.2f}"+r"$\angle$" + f"{V_ph[0]*180/pi:.2f}º   " +"\n \n \n", 
+    ax.text(off_x_leg, 1, f"   Phase A: {V_m[0]:.2f}"+r"$\angle$" + f"{V_ph[0]*180/pi:.2f}º   " +"\n \n \n", 
             size=10, ha="center", va="center", c=col_abc[0], bbox=dict(facecolor='white', ec='grey'))
 
-    ax.text(0.99, 1,  f"   Phase B: {V_m[1]:.2f}"+r"$\angle$" + f"{V_ph[1]*180/pi:.2f}º   ", 
+    ax.text(off_x_leg-0.01, 1,  f"   Phase B: {V_m[1]:.2f}"+r"$\angle$" + f"{V_ph[1]*180/pi:.2f}º   ", 
             size=10, ha="center", va="center", c=col_abc[1])
 
-    ax.text(0.99, 0.89,  f"   Phase C: {V_m[2]:.2f}" + r"$\angle$" + f"{V_ph[2]*180/pi:.2f}º   ", 
+    ax.text(off_x_leg-0.01, 0.89,  f"   Phase C: {V_m[2]:.2f}" + r"$\angle$" + f"{V_ph[2]*180/pi:.2f}º   ", 
             size=10, ha="center", va="center", c=col_abc[2])
 
     # add text legend for PN0
