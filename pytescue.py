@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 import warnings
 
-
-
 ###########################################################
 ################# Define Constants ########################
 ###########################################################
@@ -167,6 +165,7 @@ Vabc, Vfortescue = calculate(mag, theta)
 # Plot stuff
 fig = plt.figure()
 ax = fig.add_subplot()
+ax.set_title('Fortescue Transform')
 
 gs = gridspec.GridSpec(3, 1)
 
@@ -191,7 +190,7 @@ for ind, Axis in enumerate(axis):
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    gs.tight_layout(fig, rect=[0.7, 0, 1.0, 0.95])
+    gs.tight_layout(fig, rect=[0.7, 0, 1.0, 1.0])
 
 # set limits for main plot
 ax.set(xlim=lim_x, ylim=lim_y)
@@ -286,6 +285,7 @@ def update(val):
     ax.cla()
     ax.grid(ls=':')
     ax.set(xlim=lim_x, ylim=lim_y)
+    ax.set_title('Fortescue Transform')
     
     for ind, Axis in enumerate(axis):
         Axis.cla()
