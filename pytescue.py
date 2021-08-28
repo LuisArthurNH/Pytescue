@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.gridspec as gridspec 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 
@@ -12,9 +13,14 @@ pi = np.pi
 col_abc = ['b','g','r']                           # abc phasors
 col_pn0 = ['tab:brown','tab:olive','tab:cyan']    # positive, negative and zero phasors
 
-
+# main plot limits
 lim_x = (-1.25, 1.25)
 lim_y = (-1.25, 1.25)
+
+# positive negative and zero sequence plot limits
+lim_x1 = (-1, 1)
+lim_y1 = (-1, 1)
+
 # define operator a: complex 1<120º
 a = 1*np.exp(1j*2*pi/3)
 
@@ -99,6 +105,8 @@ def plots(Vabc, Vfortescue, both=True):
         V_ph.append(0) if round(abs(abc),2) == 0  else V_ph.append(np.angle(abc))
         aux += 1
 
+    # pax1 = fig.add_subplot(projection='polar')
+
     # where to place the legend
     off_x_leg = 1
 
@@ -147,11 +155,30 @@ K = 1/3
 Vabc, Vfortescue = calculate(mag, theta)
 
 # Plot stuff
-fig, ax = plt.subplots()
+fig = plt.figure()
+
+gs = gridspec.GridSpec(3, 2)
+
+ax = fig.add_subplot(gs[:,0])
+ax1 = fig.add_subplot(gs[0,1])
+ax2 = fig.add_subplot(gs[1,1])
+ax3 = fig.add_subplot(gs[2,1])
+
+gs.tight_layout(fig, rect=[0.25, 0, 1.0, 1.0])
+
+# set limits for main plot
 ax.set(xlim=lim_x, ylim=lim_y)
 ax.set_box_aspect(1)
 ax.grid(ls=':')
 
+# set limits for sequence plots
+# ax1.set_box_aspect(1)
+# ax2.set_box_aspect(1)
+# ax3.set_box_aspect(1)
+
+ax1.grid(ls=':')
+ax2.grid(ls=':')
+ax3.grid(ls=':')
 
 plots(Vabc, Vfortescue, both=False)
 
@@ -274,6 +301,8 @@ def reset(event):
 button.on_clicked(reset)
 
 
+mng = plt.get_current_fig_manager()
+mng.full_screen_toggle()
 
 plt.show()
 
