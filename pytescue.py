@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.gridspec as gridspec 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
+import warnings
+
+
 
 ###########################################################
 ################# Define Constants ########################
@@ -172,7 +175,9 @@ ax3 = fig.add_subplot(gs[2,0])
 
 axis = [ax1, ax2, ax3]
 
-gs.tight_layout(fig, rect=[0.7, 0, 1.0, 0.95])
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    gs.tight_layout(fig, rect=[0.7, 0, 1.0, 0.95])
 
 # set limits for main plot
 ax.set(xlim=lim_x, ylim=lim_y)
@@ -191,6 +196,10 @@ ax3.set_box_aspect(1)
 ax1.grid(ls=':')
 ax2.grid(ls=':')
 ax3.grid(ls=':')
+
+ax1.set_title('Positive')
+ax2.set_title('Negative')
+ax3.set_title('Zero')
 
 plots(Vabc, Vfortescue, both=False)
 
@@ -288,6 +297,10 @@ def update(val):
         Axis.grid(ls=':')
         Axis.set(xlim=lim_x1, ylim=lim_y1)
 
+    ax1.set_title('Positive')
+    ax2.set_title('Negative')
+    ax3.set_title('Zero')
+
     plots(Vabc, Vfortescue)
         
     fig.canvas.draw_idle()
@@ -318,8 +331,8 @@ def reset(event):
 button.on_clicked(reset)
 
 
-mng = plt.get_current_fig_manager()
-mng.full_screen_toggle()
+# mng = plt.get_current_fig_manager()
+# mng.full_screen_toggle()
 
 plt.show()
 
