@@ -12,6 +12,9 @@ import warnings
 
 pi = np.pi
 
+step_mag = 0.05    # step of magnitude change on sliders
+step_ang = 1
+
 # colors
 col_abc = ['b','g','r']                           # abc phasors
 col_pn0 = ['tab:brown','tab:olive','tab:cyan']    # positive, negative and zero phasors
@@ -97,7 +100,7 @@ def plots(Vabc, Vfortescue, both=True):
 
             for count, Axis in enumerate(axis):
                 if abs(pn0[count]) > 0.01:
-                    Axis.arrow(0, 0, np.real(pn0[count]), np.imag(pn0[count]), color=col_pn0[count], length_includes_head=True,
+                    Axis.arrow(np.angle(pn0[count]), 0, 0, abs(pn0[count]), color=col_pn0[count], length_includes_head=True,
                                 width=0.005, head_width=None, head_length=0.05,overhang=0.6)
         
 
@@ -113,8 +116,6 @@ def plots(Vabc, Vfortescue, both=True):
         V_m.append(abs(abc))
         V_ph.append(0) if round(abs(abc),2) == 0  else V_ph.append(np.angle(abc))
         aux += 1
-
-    # pax1 = fig.add_subplot(projection='polar')
 
     # where to place the legend
     off_x_leg = 1
@@ -160,7 +161,7 @@ theta = [theta_a, theta_b, theta_c]
 # Fortescue constant (use sqrt(3)/3 for power-invariant transform)
 K = 1/3  
 
-# Call function
+# Call function that calculates quantities
 Vabc, Vfortescue = calculate(mag, theta)
 
 # Plot stuff
@@ -169,11 +170,24 @@ ax = fig.add_subplot()
 
 gs = gridspec.GridSpec(3, 1)
 
-ax1 = fig.add_subplot(gs[0,0])
-ax2 = fig.add_subplot(gs[1,0])
-ax3 = fig.add_subplot(gs[2,0])
+ax1 = fig.add_subplot(gs[0,0],projection='polar')
+ax2 = fig.add_subplot(gs[1,0],projection='polar')
+ax3 = fig.add_subplot(gs[2,0],projection='polar')
 
 axis = [ax1, ax2, ax3]
+
+title = ['Positive','Negative','Zero']  # sequence plots names
+
+for ind, Axis in enumerate(axis):
+    Axis.cla()
+    Axis.grid(ls=':')
+    Axis.set_yticklabels([])
+    Axis.set_title(title[ind], color=col_pn0[ind])
+
+    Axis.set_xticks(pi/180. * np.linspace(180,  -180, 6, endpoint=False))  # change ticks
+    Axis.set_thetalim(-pi,pi) 
+
+
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -183,23 +197,6 @@ with warnings.catch_warnings():
 ax.set(xlim=lim_x, ylim=lim_y)
 ax.set_box_aspect(1)
 ax.grid(ls=':')
-
-# set limits for sequence plots
-ax1.set(xlim=lim_x1, ylim=lim_y1)
-ax2.set(xlim=lim_x1, ylim=lim_y1)
-ax3.set(xlim=lim_x1, ylim=lim_y1)
-
-ax1.set_box_aspect(1)
-ax2.set_box_aspect(1)
-ax3.set_box_aspect(1)
-
-ax1.grid(ls=':')
-ax2.grid(ls=':')
-ax3.grid(ls=':')
-
-ax1.set_title('Positive')
-ax2.set_title('Negative')
-ax3.set_title('Zero')
 
 plots(Vabc, Vfortescue, both=False)
 
@@ -217,9 +214,9 @@ mag_min = 0                        # min freq
 
 
 ###### theta limits
-theta_ini = 0                        # initial frequency plot
-theta_max = 180                      # max frequency on range [Hz]
-theta_min = -180                        # min freq
+theta_ini = 0                      # initial frequency plot
+theta_max = 180                    # max frequency on range [Hz]
+theta_min = -180                   # min freq
 
 axcolor = 'lightgoldenrodyellow'
 
@@ -242,24 +239,22 @@ resetax = plt.axes([0.0854, 0.003, 0.08, 0.04])
 
 ###### create sliders
 
-step_mag = 0.08
-
 # phase a
 slid_mag_a = Slider(ax=axmag_a,label=r"$|f_{A}|$",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=step_mag,
 orientation="vertical",color=col_abc[0])
-slid_theta_a = Slider(ax=axtheta_a,label=r"$\theta_{A}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+slid_theta_a = Slider(ax=axtheta_a,label=r"$\theta_{A}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=step_ang,
 orientation="vertical",color=col_abc[0])
 
 # phase b
 slid_mag_b = Slider(ax=axmag_b,label=r"$|f_{B}|$",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=step_mag,
 orientation="vertical",color=col_abc[1])
-slid_theta_b = Slider(ax=axtheta_b,label=r"$\theta_{B}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+slid_theta_b = Slider(ax=axtheta_b,label=r"$\theta_{B}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=step_ang,
 orientation="vertical",color=col_abc[1])
 
 # phase c
 slid_mag_c = Slider(ax=axmag_c,label=r"$|f_{C}|$",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=step_mag,
 orientation="vertical",color=col_abc[2])
-slid_theta_c = Slider(ax=axtheta_c,label=r"$\theta_{C}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=0.1,
+slid_theta_c = Slider(ax=axtheta_c,label=r"$\theta_{C}$",valmin=theta_min,valmax=theta_max,valinit=theta_ini,valstep=step_ang,
 orientation="vertical",color=col_abc[2])
 
 # reset button
@@ -291,15 +286,16 @@ def update(val):
     ax.cla()
     ax.grid(ls=':')
     ax.set(xlim=lim_x, ylim=lim_y)
-
-    for Axis in axis:
+    
+    for ind, Axis in enumerate(axis):
         Axis.cla()
         Axis.grid(ls=':')
-        Axis.set(xlim=lim_x1, ylim=lim_y1)
+        Axis.set_yticklabels([])
+        Axis.set_title(title[ind])
+        Axis.set_title(title[ind], color=col_pn0[ind])
 
-    ax1.set_title('Positive')
-    ax2.set_title('Negative')
-    ax3.set_title('Zero')
+        Axis.set_xticks(pi/180. * np.linspace(180,  -180, 6, endpoint=False))  # change ticks
+        Axis.set_thetalim(-pi,pi)                                              # reset full circle
 
     plots(Vabc, Vfortescue)
         
@@ -329,10 +325,6 @@ def reset(event):
     slid_theta_c.reset()
     
 button.on_clicked(reset)
-
-
-# mng = plt.get_current_fig_manager()
-# mng.full_screen_toggle()
 
 plt.show()
 
