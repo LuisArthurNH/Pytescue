@@ -56,9 +56,18 @@ def calculate(mag, theta):
 
 
 
+
 def plots(Vabc, Vfortescue, both=True):
 
-    if both:
+    # calculate abs and phase for each
+    V_m = []
+    V_ph = []
+
+    V_pn_m = []
+    V_pn_ph = []
+
+
+    if True:
         for pn0 in Vfortescue:
             aux = 0
             off_x = 0
@@ -74,6 +83,10 @@ def plots(Vabc, Vfortescue, both=True):
                     off_y += np.imag(pn0)
                 aux += 1
 
+                # calculate phase and module for pn0 quantities
+                V_pn_m.append(abs(pn0))
+                V_pn_ph.append(0) if round(abs(pn0),2) == 0 else V_pn_ph.append(np.angle(pn0))
+
     aux = 0 
     for abc in Vabc:
         # plot abc voltage phasors
@@ -81,26 +94,30 @@ def plots(Vabc, Vfortescue, both=True):
         if abs(abc) > 0.01:
             ax.arrow(0, 0, np.real(abc), np.imag(abc), color=color_a, length_includes_head=True, width=0.005, head_width=None, head_length=None,overhang=0.6) 
         
+        # calculate phase and module for abc quantities
+        V_m.append(abs(abc))
+        V_ph.append(0) if round(abs(abc),2) == 0  else V_ph.append(np.angle(abc))
         aux += 1
 
+
     # add text legend for ABC components
-    ax.text(1, 1, "Phase A \n \n \n", size=10,
-            ha="center", va="center", c=col_abc[0], bbox=dict(facecolor='white', ec='grey'))
+    ax.text(1, 1, f"   Phase A: {V_m[0]:.2f}"+r"$\angle$" + f"{V_ph[0]*180/pi:.2f}º   " +"\n \n \n", 
+            size=10, ha="center", va="center", c=col_abc[0], bbox=dict(facecolor='white', ec='grey'))
 
-    ax.text(0.99, 1, "Phase B", size=10,
-            ha="center", va="center", c=col_abc[1])
+    ax.text(0.99, 1,  f"   Phase B: {V_m[1]:.2f}"+r"$\angle$" + f"{V_ph[1]*180/pi:.2f}º   ", 
+            size=10, ha="center", va="center", c=col_abc[1])
 
-    ax.text(0.99, 0.89, "Phase C", size=10,
-            ha="center", va="center", c=col_abc[2])
+    ax.text(0.99, 0.89,  f"   Phase C: {V_m[2]:.2f}" + r"$\angle$" + f"{V_ph[2]*180/pi:.2f}º   ", 
+            size=10, ha="center", va="center", c=col_abc[2])
 
     # add text legend for PN0
-    ax.text(1, -1, " Positive \n \n \n", size=10,
+    ax.text(1, -1, f"   Positive: {V_pn_m[0]:.2f}"+r"$\angle$" + f"{V_pn_ph[0]*180/pi:3.2f}º   " +"\n \n \n", size=10,
             ha="center", va="center", c=col_pn0[0], weight='bold', bbox=dict(facecolor='white', ec='grey'))
 
-    ax.text(0.99, -1, " Negative", size=10,
+    ax.text(0.99, -1,f"   Negative: {V_pn_m[1]:.2f}"+r"$\angle$" + f"{V_pn_ph[1]*180/pi:3.2f}º   ", size=10,
             ha="center", va="center", c=col_pn0[1], weight='bold')
 
-    ax.text(0.99, -1.1, "Zero", size=10,
+    ax.text(0.99, -1.1, f"   Zero: {V_pn_m[2]:.2f}"+r"$\angle$" + f"{V_pn_ph[2]*180/pi:3.2f}º   ", size=10,
             ha="center", va="center", c=col_pn0[2], weight='bold')
 
 
@@ -116,9 +133,9 @@ mag_b = 1
 mag_c = 1
 mag = [mag_a, mag_b, mag_c]
 
-theta_a = 0*(20)*pi/180
-theta_b = 0*(60)*pi/180
-theta_c = 0*(120)*pi/180
+theta_a = 0
+theta_b = 0
+theta_c = 0
 theta = [theta_a, theta_b, theta_c]
 
 # Fortescue constant (use sqrt(3)/3 for power-invariant transform)
