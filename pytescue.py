@@ -18,8 +18,8 @@ lim_x = (-1.25, 1.25)
 lim_y = (-1.25, 1.25)
 
 # positive negative and zero sequence plot limits
-lim_x1 = (-1, 1)
-lim_y1 = (-1, 1)
+lim_x1 = (-1.1, 1.1)
+lim_y1 = (-1.1, 1.1)
 
 # define operator a: complex 1<120º
 a = 1*np.exp(1j*2*pi/3)
@@ -81,24 +81,30 @@ def plots(Vabc, Vfortescue, both=True):
 
             for phase_pn0 in pn0:
                 color_p = col_pn0[aux]
-                pn0 = phase_pn0
-                if abs(pn0) > 0.01:
-                    ax.arrow(off_x, off_y, np.real(pn0), np.imag(pn0), color=color_p, length_includes_head=True,
-                             width=0.005, head_width=None, head_length=None,overhang=0.6) 
-                    off_x += np.real(pn0)
-                    off_y += np.imag(pn0)
+                if abs(phase_pn0) > 0.01:
+                    ax.arrow(off_x, off_y, np.real(phase_pn0), np.imag(phase_pn0), color=color_p, length_includes_head=True,
+                             width=0.005, head_width=0.03, head_length=None,overhang=0.6) 
+                    off_x += np.real(phase_pn0)
+                    off_y += np.imag(phase_pn0)
                 aux += 1
 
                 # calculate phase and module for pn0 quantities
-                V_pn_m.append(abs(pn0))
-                V_pn_ph.append(0) if round(abs(pn0),2) == 0 else V_pn_ph.append(np.angle(pn0))
+                V_pn_m.append(abs(phase_pn0))
+                V_pn_ph.append(0) if round(abs(phase_pn0),2) == 0 else V_pn_ph.append(np.angle(phase_pn0))  
+
+            for count, Axis in enumerate(axis):
+                if abs(pn0[count]) > 0.01:
+                    Axis.arrow(0, 0, np.real(pn0[count]), np.imag(pn0[count]), color=col_pn0[count], length_includes_head=True,
+                                width=0.005, head_width=None, head_length=0.05,overhang=0.6)
+        
 
     aux = 0 
     for abc in Vabc:
         # plot abc voltage phasors
         color_a = col_abc[aux]
         if abs(abc) > 0.01:
-            ax.arrow(0, 0, np.real(abc), np.imag(abc), color=color_a, length_includes_head=True, width=0.005, head_width=None, head_length=None,overhang=0.6) 
+            ax.arrow(0, 0, np.real(abc), np.imag(abc), color=color_a, length_includes_head=True, 
+                        width=0.005, head_width=0.03, head_length=None,overhang=0.6) 
         
         # calculate phase and module for abc quantities
         V_m.append(abs(abc))
@@ -156,15 +162,17 @@ Vabc, Vfortescue = calculate(mag, theta)
 
 # Plot stuff
 fig = plt.figure()
+ax = fig.add_subplot()
 
-gs = gridspec.GridSpec(3, 2)
+gs = gridspec.GridSpec(3, 1)
 
-ax = fig.add_subplot(gs[:,0])
-ax1 = fig.add_subplot(gs[0,1])
-ax2 = fig.add_subplot(gs[1,1])
-ax3 = fig.add_subplot(gs[2,1])
+ax1 = fig.add_subplot(gs[0,0])
+ax2 = fig.add_subplot(gs[1,0])
+ax3 = fig.add_subplot(gs[2,0])
 
-gs.tight_layout(fig, rect=[0.25, 0, 1.0, 1.0])
+axis = [ax1, ax2, ax3]
+
+gs.tight_layout(fig, rect=[0.7, 0, 1.0, 0.95])
 
 # set limits for main plot
 ax.set(xlim=lim_x, ylim=lim_y)
@@ -172,9 +180,13 @@ ax.set_box_aspect(1)
 ax.grid(ls=':')
 
 # set limits for sequence plots
-# ax1.set_box_aspect(1)
-# ax2.set_box_aspect(1)
-# ax3.set_box_aspect(1)
+ax1.set(xlim=lim_x1, ylim=lim_y1)
+ax2.set(xlim=lim_x1, ylim=lim_y1)
+ax3.set(xlim=lim_x1, ylim=lim_y1)
+
+ax1.set_box_aspect(1)
+ax2.set_box_aspect(1)
+ax3.set_box_aspect(1)
 
 ax1.grid(ls=':')
 ax2.grid(ls=':')
@@ -221,7 +233,7 @@ resetax = plt.axes([0.0854, 0.003, 0.08, 0.04])
 
 ###### create sliders
 
-step_mag = 0.01
+step_mag = 0.08
 
 # phase a
 slid_mag_a = Slider(ax=axmag_a,label=r"$|f_{A}|$",valmin=mag_min,valmax=mag_max,valinit=mag_ini,valstep=step_mag,
@@ -270,6 +282,11 @@ def update(val):
     ax.cla()
     ax.grid(ls=':')
     ax.set(xlim=lim_x, ylim=lim_y)
+
+    for Axis in axis:
+        Axis.cla()
+        Axis.grid(ls=':')
+        Axis.set(xlim=lim_x1, ylim=lim_y1)
 
     plots(Vabc, Vfortescue)
         
